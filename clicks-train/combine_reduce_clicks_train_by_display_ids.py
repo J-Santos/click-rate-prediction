@@ -12,7 +12,6 @@ output_file = sys.argv[2]
 list_of_files = []
 
 def processDataframe(dataframe):
-	#click_train = pd.read_csv(filename, chunksize=100)
 
 	list_of_dicts = []
 	chunk_num = 1
