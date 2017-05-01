@@ -23,19 +23,23 @@ def processFile(filename, output_dir):
 		chunk0 = time.clock()
 		#print chunk
 		for (i, row) in chunk.iterrows():
-			#print datetime.datetime.fromtimestamp(time_offset+row.get('timestamp'))
-			#date = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=time_offset+row.get('timestamp'))
-			print row
-			print row.get('timestamp')
-			day = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).day
-			#print "date:"
-			#print date.day
-			#print "day:"
-			#print day
-			hour = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).hour
-			minute = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).minute
-			# 0=monday, 1=tuesday ...
-			weekday = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).weekday()
+			try:
+				date = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp'))
+				valid = True
+			except ValueError, e:
+				valid = False
+				pass
+			if(valid):
+				day = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).day
+				hour = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).hour
+				minute = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).minute
+				# 0=monday, 1=tuesday ...
+				weekday = datetime.datetime.fromtimestamp(time_offset+row.get('timestamp')).weekday()
+			else:
+				day = 'none'
+				hour = 'none'
+				minute = 'none'
+				weekday = 'none'
 			geo_location = row.get('geo_location')
 			country = 'none'
 			state = 'none'
@@ -68,7 +72,7 @@ def processFile(filename, output_dir):
 			output_file = output_dir + "/events_normalized" + str(file_num) + ".csv"
 			output_df = pd.DataFrame(list_of_dicts)
 			#print output_df
-			output_df.to_csv(output_file, sep=',', index=False, columns=["display_id", "uuid", "document_id", "platform", "country", "state", "dma", "day", "hour", "minute", "weekday"])
+			output_df.to_csv(output_file, sep=',', index=False, columns=["display_id", "uuid", "document_id", "platform", "country", "state", "dma", "day", "hour", "minute", "weekday"])	
 			del list_of_dicts
 			list_of_dicts = []
 			file_num = file_num + 1
