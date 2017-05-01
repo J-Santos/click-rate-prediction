@@ -29,10 +29,9 @@ for chunk in click_train:
 	chunk_time = chunk1 - chunk0
 	print "%f seconds to process chunk %d" % (chunk_time, chunk_num)
 	if((chunk_num % 1000) == 0):
-		output_df.to_csv(output_file, sep=',', index=False,columns=["display_id", "clicked_ad_id"])
+		output_file = output_directory+ "/clicks_train_by_ad_clicked_" + str(file_num) + ".csv"
 		output_df = pd.DataFrame(list_of_dicts)
-		#print output_df
-		output_df.to_csv(output_file, sep=',', index=False)
+		output_df.to_csv(output_file, sep=',', index=False,columns=["display_id", "clicked_ad_id"])
 		del list_of_dicts
 		list_of_dicts = []
 		file_num = file_num + 1
