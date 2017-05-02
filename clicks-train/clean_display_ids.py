@@ -27,7 +27,7 @@ def processFile(filename, output_file):
 
 		chunk1 = time.clock()
 		chunk_time = chunk1 - chunk0
-		print "%d seconds to process chunk %d." % (chunk_time, chunk_num)
+		print "%f seconds to process chunk %d." % (chunk_time, chunk_num)
 
 		chunk_num = chunk_num + 1
 		del chunk
