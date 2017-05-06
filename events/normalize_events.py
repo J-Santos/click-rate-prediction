@@ -72,6 +72,7 @@ def processFile(filename, output_dir):
 			output_file = output_dir + "/events_normalized" + str(file_num) + ".csv"
 			output_df = pd.DataFrame(list_of_dicts)
 			#print output_df
+			output_df = output_df.sort_values(by='display_id', ascending=True)
 			output_df.to_csv(output_file, sep=',', index=False, columns=["display_id", "uuid", "document_id", "platform", "country", "state", "dma", "day", "hour", "minute", "weekday"])	
 			del list_of_dicts
 			list_of_dicts = []
@@ -85,6 +86,7 @@ def processFile(filename, output_dir):
 	output_df = pd.DataFrame(list_of_dicts)
 	output_file = output_dir + "/events_normalized_last.csv"
 	#output_df = output_df.sort_values(by='ctr', ascending=False)
+	output_df = output_df.sort_values(by='display_id', ascending=True)
 	output_df.to_csv(output_file, sep=',', index=False, columns=["display_id", "uuid", "document_id", "platform", "country", "state", "dma", "day", "hour", "minute", "weekday"])
 	del output_df
 	del list_of_dicts

@@ -31,6 +31,7 @@ for chunk in click_train:
 	if((chunk_num % 1000) == 0):
 		output_file = output_directory+ "/clicks_train_by_ad_clicked_" + str(file_num) + ".csv"
 		output_df = pd.DataFrame(list_of_dicts)
+		output_df = output_df.sort_values(by='display_id', ascending=True)
 		output_df.to_csv(output_file, sep=',', index=False,columns=["display_id", "clicked_ad_id"])
 		del list_of_dicts
 		list_of_dicts = []
@@ -43,6 +44,7 @@ for chunk in click_train:
 del click_train
 output_file = output_directory+ "/clicks_train_by_ad_clicked_" + str(file_num) + ".csv"
 output_df = pd.DataFrame(list_of_dicts)
+output_df = output_df.sort_values(by='display_id', ascending=True)
 #print output_df
 output_df.to_csv(output_file, sep=',', index=False,columns=["display_id", "clicked_ad_id"])
 
