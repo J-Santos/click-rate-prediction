@@ -2,28 +2,41 @@ var express             =   require("express");
 var app                 =   express();
 var bodyParser          =   require("body-parser");
 var router              =   express.Router();
-var dbconnection        =   require('./dbconnection.js');
-
-dbconnection.connect(function(err){
- if(!err) {
-     console.log("Database is connected ...");  
- } else {
-     console.log("Error connecting database ... \n\n");  
- }
- });
+var queryModel          =   require("./models/query");
 
 router.get("/",function(req,res){
     res.json({"error" : false,"message" : "Hello World"});
 });
 
-router.get("/api",function(req,res){
-    dbconnection.query('SELECT * from events LIMIT 2', function(err, rows, fields) {
-        dbconnection.end();
-        if (!err){
-            res.json(rows)
-            console.log('The solution is: ', JSON.stringify(rows));
+// router.get("/api",function(req,res){
+//     dbconnection.query('SELECT count(*) as count from events where country = "US"', function(err, rows, fields) {
+//         dbconnection.end();
+//         if (!err){
+//             res.json(rows)
+//             //console.log('The solution is: ', JSON.stringify(rows));
+//         }else{
+//             res.json({"error" : true,"message" : "Error processing the query."});
+//         }
+//     });
+
+// });
+
+router.get("/api/ad_id/:ad_id",function(req,res){
+    // dbconnection.query('SELECT count(*) as count from events where country = "US"', function(err, rows, fields) {
+    //     dbconnection.end();
+    //     if (!err){
+    //         res.json(rows)
+    //         //console.log('The solution is: ', JSON.stringify(rows));
+    //     }else{
+    //         res.json({"error" : true,"message" : "Error processing the query."});
+    //     }
+    // });
+    queryModel.dbQuery(req, function(err, data){
+        if(err){
+            //res.json({"error" : true,"message" : "Error processing the query."});
+            res.status(500).send("Error processing the query.");
         }else{
-            res.json({"error" : true,"message" : "Error processing the query."});
+            res.status(200).json(data);
         }
     });
 
