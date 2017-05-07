@@ -21,7 +21,7 @@ router.get("/",function(req,res){
 
 // });
 
-router.get("/api/ad_id/:ad_id",function(req,res){
+router.get("/api/state/:state/ad_id/:ad_id",function(req,res){
     // dbconnection.query('SELECT count(*) as count from events where country = "US"', function(err, rows, fields) {
     //     dbconnection.end();
     //     if (!err){
