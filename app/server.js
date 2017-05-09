@@ -1,11 +1,23 @@
 var express             =   require("express");
 var app                 =   express();
 var bodyParser          =   require("body-parser");
+var path                =   require("path");
 var router              =   express.Router();
 var queryModel          =   require("./models/query");
 
 router.get("/",function(req,res){
     res.json({"error" : false,"message" : "Hello World"});
+    //res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+router.get("/index.html",function(req,res){
+    //res.json({"error" : false,"message" : "Hello World"});
+    res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+router.get("/new_index.html",function(req,res){
+    //res.json({"error" : false,"message" : "Hello World"});
+    res.sendFile(path.join(__dirname + '/new_index.html'));
 });
 
 // router.get("/api",function(req,res){
