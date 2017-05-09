@@ -14,10 +14,10 @@ db = "cmpe239projectdb"
 
 
 #mysql -h jesdbinstance.cimw8kngg4r8.us-west-2.rds.amazonaws.com -P 3306 -u dbuser -p
-engine = create_engine("mysql+mysqldb://dbuser:239dbuser"+''+"@jesdbinstance.cimw8kngg4r8.us-west-2.rds.amazonaws.com:3306/" + db)
+#engine = create_engine("mysql+mysqldb://dbuser:239dbuser"+''+"@jesdbinstance.cimw8kngg4r8.us-west-2.rds.amazonaws.com:3306/" + db)
 
 
-#engine = create_engine("mysql+mysqldb://root:"+''+"@localhost/" + db)
+engine = create_engine("mysql+mysqldb://root:"+''+"@localhost/" + db)
 
 clicks_rate_table = 'clicksrate'
 events_table = 'events'
