@@ -1,6 +1,7 @@
 var async             =   require("async");
 var dbconnection      =   require('../dbconnection.js');
 var stateVariables    =   require("../state_variables");
+var ejs				  =	  require('ejs');
 
 dbconnection.connect(function(err){
  if(!err) {
@@ -154,4 +155,99 @@ function processNewQueries(adId, state, callback){
 
 }
 
-//exports.selectQueryByState = selectQueryByState
+
+
+exports.file_4 = function (req, callback){
+	console.log(req.params)
+	// var temp=req.params.start_date
+ //   var date1=temp.split("-");
+ //  // console.log(date1[2]);
+ //   var date2=date1[2].split("T");
+ //   date1=date2[0];
+ //  //  console.log(date1);
+
+ //    var temp=req.params.end_date
+ //    var date2=temp.split("-");
+ //  //  console.log(date2[2]);
+ //    var temp=date2[2].split("T");
+ //    date2=temp[0];
+ // //   console.log(date2);
+
+   var country="US";
+   var state=req.params.state
+   var dma="807";
+   var date1=req.params.start_date;
+   var date2=req.params.end_date;
+   var start_time=req.params.start_time
+   var end_time=req.params.end_time
+
+
+   /*query1--- to list total number of users in the given range in each platform*/
+
+  var query="select count(uuid) as total_count,platform from "+state+"_events where dma='"+dma+"' and day between '"+date1+"' and '"+date2+"' and hour between + "+
+       "'"+start_time+"' and '"+end_time+"' GROUP BY platform";
+
+
+    /*query1-- to list number of users in per platform per hour*/
+
+
+   var query1="select count(uuid) as total_count,platform,hour from "+state+"_events where dma='"+dma+"' and day between '"+date1+"' and '"+date2+"' and hour between + "+
+           "'"+start_time+"' and '"+end_time+"' GROUP BY hour, platform";
+
+
+  /*
+   var query2="select count("+state+"_events.uuid) as total_count,platform,traffic_source from "+state+"_events,page_views where dma='"+dma+"' and day between '"+date1+"' and '"+date2+"' and hour between + "+
+       "'"+start_time+"' and '"+end_time+"' and "+state+"_events.document_id=page_views.document_id GROUP BY platform, traffic_source";
+
+    */
+
+    console.log(query);
+   dbconnection.query(query,function (err,result) {
+      if(err)
+      {
+          console.log("some error");
+          console.log(err);
+      }
+      else
+      {
+          console.log("result");
+          console.log(result);
+
+
+
+          /*
+          var query1="select events.count(uuid) as total_count,traffic_source as source, platform from events,page_views where events.country='"+country+"' and events.state='"+state+"' and events.dma='"+dma+"' and events.day between '"+date1+"' and '"+date2+"' and events.hour between + "+
+              "'"+start_time+"' and '"+end_time+"' and events.document_id=page_views.document_id GROUP BY source";
+
+            */
+          console.log(query1);
+
+
+          dbconnection.query(query1,function (err,result1) {
+
+              if(err)
+              {
+                  console.log("some error 2");
+                  console.log(err);
+              }
+              else
+              {
+                  console.log("result1");
+                  console.log(result1);
+
+                  var final_result={
+                      result1:result,
+                      result2:result1
+              };
+                  console.log(final_result);
+                    // res.send(final_result);
+                    callback(err, final_result)
+              }
+          })
+
+      }
+   });
+ 	
+}
+
+

@@ -33,14 +33,17 @@
 <body>
 
 <div class="container" ng-app="analytics_4" ng-controller="myctrl">
-    <h2>Platform-Region relationship</h2>
+    <h3>Probability of clicks for an Ad ID based on state</h3>
+  
+  
+  <br>
+  <br>
 
-
+  <div class="row">
     <div class="form-group">
         <label for="state" class="col-sm-2 control-label">State</label>
-        <div class="col-sm-6">
-            <select class="form-control" id="state" name="state" ng-model="state">
-
+        <div class="col-sm-4">
+            <select class="form-control" id="state" name="state" ng-model="state" placeholder="select the state">
                 <option value="AK">Alaska</option>
                 <option value="AL">Alabama</option>
                 <option value="AR">Arkansas</option>
@@ -96,18 +99,19 @@
             </select>
         </div>
     </div>
+  </div>
 
 
-    <br>
+  
 
-    <br>
+    
 
     <br>
     <br>
     <div class="row">
     <div class="form-group">
         <label for="state" class="col-sm-2 control-label">Ad ID</label>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <input type="text" class="form-control" id="ad_id" ng-model="ad_id" placeholder="Enter ID">
         </div>
     </div>
@@ -117,7 +121,7 @@
     <br>
     <div class="form-group">
 
-        <div class="col-sm-3 col-md-offset-4">
+        <div class="col-sm-3 col-md-offset-3">
             <input type="submit" class="btn" ng-click="submit()">
             <br><br>
             <div id="spinner" class="loader" style="display: none;"></div>
@@ -196,80 +200,6 @@
 
                 $("#probability_text").text(output_text);
                 $("#probability_text").removeAttr('style');
-                // deferred.resolve(data);
-                // return deferred.promise
-               //  console.log("check result 1");
-               //  console.log(response.result1);
-               //  console.log(response.result2);
-               //  console.log(response.result2.length);
-
-               //  console.log("response platform");
-               //  console.log(response.result1[0].total_count);
-               //  console.log(response.result1[0].platform);
-
-
-
-               // google.charts.load('current', {'packages':['corechart']});
-               // google.charts.setOnLoadCallback(drawChart);
-
-               // function drawChart() {
-
-               //     var data = google.visualization.arrayToDataTable([
-               //         ['Platform', 'Count per Platform'],
-               //         ['Desktop',     response.result1[0].total_count],
-               //         ['Mobile',      response.result1[1].total_count],
-               //         ['Tablet',  response.result1[2].total_count]
-
-               //     ]);
-
-               //     var options = {
-               //         title: 'Users per Platform'
-               //     };
-
-               //     var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-               //     chart.draw(data, options);
-               // }
-
-
-
-               // /*linecharts*/
-
-               // google.charts.load('current', {'packages':['line']});
-               // google.charts.setOnLoadCallback(drawCharttwo);
-
-               // function drawCharttwo() {
-
-               //     var data = new google.visualization.DataTable();
-               //     data.addColumn('number', 'Hours');
-               //     data.addColumn('number', 'Platform 1');
-               //     data.addColumn('number', 'Platform 2');
-               //     data.addColumn('number', 'Platform 3');
-
-               //     /*hour, platform 1, platform 2, platform 3*/
-               //      console.log("starting for loop");
-               //     for(var i=0;i<response.result2.length;i=i+3)
-               //     {
-               //         console.log(response.result2[i].hour,response.result2[i].total_count,response.result2[i+1].total_count,response.result2[i+2].total_count);
-               //         data.addRows([response.result2[i].hour,response.result2[i].total_count,response.result2[i+1].total_count,response.result2[i+2].total_count]);
-               //     }
-
-
-
-               //     var options = {
-               //         chart: {
-               //             title: 'Total count of user using a platform per hour',
-               //             subtitle: 'Time Range'+response.result2[0].hour+' to '+response.result2[15].hour,
-               //         },
-               //         width: 900,
-               //         height: 500
-               //     };
-
-               //     var chart = new google.visualization.LineChart(document.getElementById('linechart_material'));
-
-               //     chart.draw(data, google.charts.Line.convertOptions(options));
-               // }
-
 
            }).error(function myerror(err){
                console.log(err);
