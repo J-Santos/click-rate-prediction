@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Prediction/Clustering</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <style>
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 550px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+        
+    /* On small screens, set height to 'auto' for the grid */
+    @media screen and (max-width: 767px) {
+      .row.content {height: auto;} 
+    }
+
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 50px;
+        height: 50px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+      }
+
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="/">Empower</a>
+    </div>
+    <!--
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#">Dashboard</a></li>
+        <li><a href="#">Age</a></li>
+        <li><a href="#">Gender</a></li>
+        <li><a href="#">Geo</a></li>
+      </ul>
+    </div>
+    -->
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-2 sidenav hidden-xs">
+      <br>
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="/index.html">Dashboard</a></li>
+        <li><a href="https://www.nytimes.com/2016/10/31/business/media/publishers-rethink-outbrain-taboola-ads.html" 
+               target="_blank">Visit Ad Campaign</a></li>
+        <li><a href="/analytics.html">Show Past Analytics</a></li>
+        <li class="active"><a href="/state-prediction.html">Prediction/Clustering</a></li>
+      </ul><br>
+    </div>
+    <br>
+
+<div class="container" ng-app="analytics_4" ng-controller="myctrl">
+
+  <div class="col-sm-9">
+    <div class="row">
+    <b><h2 class="text-primary" align="center">Probability of Click Given State</h2></b>
+    <br>
+      <div class="form-group">
+          <label for="state" class="col-sm-2 control-label col-md-offset-2">State</label>
+          <div class="col-sm-4">
+              <select class="form-control" id="state" name="state" ng-model="state" placeholder="select the state">
+                  <option value="AK">Alaska</option>
+                  <option value="AL">Alabama</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DC">District of Columbia</option>
+                  <option value="DE">Delaware</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="IA">Iowa</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MD">Maryland</option>
+                  <option value="ME">Maine</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MT">Montana</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NY">New York</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="PR">Puerto Rico</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VA">Virginia</option>
+                  <option value="VT">Vermont</option>
+                  <option value="WA">Washington</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WY">Wyoming</option>
+              </select>
+          </div>
+      </div>
+    </div>
+
+    <br>
+    <br>
+    <div class="row">
+    <div class="form-group">
+        <label for="state" class="col-sm-2 control-label col-md-offset-2">Ad ID</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="ad_id" ng-model="ad_id" placeholder="Enter ID">
+        </div>
+    </div>
+    </div>
+
+    <br>
+    <br>
+    <div class="form-group">
+
+        <div class="col-sm-3 col-md-offset-4">
+            <input type="submit" class="btn-primary" ng-click="submit()">
+            <br><br>
+            <div id="spinner" class="loader" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <br><br>
+            <div class="/*col-sm-9*/ col-md-offset-2 text-secondary">
+                <h4><b id="probability_text" style="display: none;">This text is bold</b></h4>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="form-group">
+
+            <div class="/*col-sm-9 col-md-offset-2*/">
+                <div id="chart_div_state" style="width: 900px; height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+
+            <div class="/*col-sm-9 col-md-offset-2*/">
+                <div id="chart_div_US" style="width: 900px; height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+
+  </div>
+</div>
+	    
+</div>
+
+</body>
+<script type="text/javascript">
+  $(document).ready(function () {
+    var height1 = $('.content').height()
+    var height2 = $('body').height()
+
+    if (height1 > height2) {
+        $('.sidenav').height(height1)
+    } else {
+        $('.sidenav').height(height2)
+    }
+});
+</script>
+
+<script>
+    var app=angular.module("analytics_4",[]);
+    app.controller("myctrl",function($scope,$http){
+        $scope.submit=function(){
+            $("#probability_text").hide();
+            $("#spinner").removeAttr('style');
+            console.log($scope.state);
+            console.log($scope.ad_id);
+            //var request_url = "http://localhost:5000/api/state/"+$scope.state+"/ad_id/"+$scope.ad_id
+            var request_url = "/api/state/"+$scope.state+"/ad_id/"+$scope.ad_id
+            //var deferred = $q.defer();
+            $http({
+                method:'GET',
+                url: request_url
+            }).success(function mysuccess(response){
+                $("#spinner").hide();
+                console.log(response);
+
+                ////////////////////
+                //                                             P(state | ad is clicked) * P(clicked) 
+                // P(Ad is clicked | state) = _____________________________________________________________________________________
+                //
+                //                            P(state | ad is clicked) * P(clicked) + P(state | ad is NOT clicked) * P(NOT clicked)
+                //
+                ////////////////////
+
+                var us_count = response.us_cluster.clusters[0].length + response.us_cluster.clusters[1].length
+                var state_count = response.state_cluster.clusters[0].length + response.state_cluster.clusters[1].length
+
+                var P_state_given_ad_is_clicked = state_count / us_count
+                var P_clicked = response.ctr
+
+                var P_state_given_ad_is_NOT_clicked = 1 - P_state_given_ad_is_clicked 
+                var P_NOT_clicked = 1 - P_clicked
+
+                var P_ad_is_clicked_given_state = (P_state_given_ad_is_clicked * P_clicked) / (P_state_given_ad_is_clicked * P_clicked + P_state_given_ad_is_NOT_clicked * P_NOT_clicked)                
+
+                var probability_state = 1/50
+                var probability_state_given_clicked = state_count/us_count
+
+                console.log("US count: "+ us_count)
+                console.log("State count: "+ state_count)
+
+                var output_text = "The probability that Ad ID " + response.ad_id + " is clicked given state of " + response.state
+                output_text = output_text + " is: " + P_ad_is_clicked_given_state.toFixed(5)
+                console.log("probability is: "+P_ad_is_clicked_given_state)
+
+                $("#probability_text").text(output_text);
+                $("#probability_text").removeAttr('style');
+
+
+
+                google.charts.load('current', {'packages':['corechart', 'scatter']});
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    var data = new google.visualization.DataTable();
+                    console.log("----------------------")
+                    console.log(response.state_cluster)
+                    data.addColumn('number', 'Hour');
+                    data.addColumn('number', 'Cluster 1');
+                    data.addColumn('number', 'Cluster 2');
+                    data.addColumn('number', 'Centroid of Cluster 1');
+                    data.addColumn('number', 'Centroid of Cluster 2');
+                    var USData = [];
+                    console.log("------US_Cluster--------------")
+                    console.log(response.us_cluster)
+                    console.log("------US_Cluster--------------")
+                    var usClusterRes1 = response.us_cluster.clusters[0]
+                    for (var i = 0 ; i < usClusterRes1.length ; i++) {
+                        USData.push([ usClusterRes1[i][0], usClusterRes1[i][1] , null, null, null]);
+                    }
+
+                    var usClusterRes2 = response.us_cluster.clusters[1]
+                    for (var i = 0 ; i < usClusterRes2.length ; i++) {
+                        USData.push([ usClusterRes2[i][0], null, usClusterRes2[i][1], null, null]);
+                    }
+                    ///push centroid of cluster 1
+                    USData.push([response.us_cluster.means[0][0], null, null, response.us_cluster.means[0][1], null])
+                    ///push centroid of cluster 2
+                    USData.push([response.us_cluster.means[1][0], null, null, null, response.us_cluster.means[1][1]])
+                    data.addRows(USData);
+                    var options = {
+                      title: 'Hour vs. Minutes for US events',
+                      hAxis: {title: 'Hour', minValue: 0, maxValue: 24},
+                      vAxis: {title: 'Minutes', minValue: 0, maxValue: 60},
+                      legend: 'right',
+                      colors: ['#b31aff', '#ffb84d', '#440066', '#b36b00']
+                    };
+
+                    var chart = new google.visualization.ScatterChart(document.getElementById('chart_div_US'));
+
+                    chart.draw(data, options);
+                }
+
+                google.charts.load('current', {'packages':['corechart', 'scatter']});
+                google.charts.setOnLoadCallback(drawChartTwo);
+                function drawChartTwo() {
+                    var data = new google.visualization.DataTable();
+                    console.log("----------------------")
+                    console.log(response.state_cluster)
+                    data.addColumn('number', 'Hour');
+                    data.addColumn('number', 'Cluster 1');
+                    data.addColumn('number', 'Cluster 2');
+                    data.addColumn('number', 'Centroid of Cluster 1');
+                    data.addColumn('number', 'Centroid of Cluster 2');
+
+                    var stateData = [];
+                    console.log("------State_Cluster--------------")
+                    console.log(response.state_cluster)
+                    console.log("------State_Cluster--------------")
+                    var stateClusterRes1 = response.state_cluster.clusters[0]
+                    for (var i = 0 ; i < stateClusterRes1.length ; i++) {
+                        stateData.push([ stateClusterRes1[i][0], stateClusterRes1[i][1] , null, null, null]);
+                    }
+                    var stateClusterRes2 = response.state_cluster.clusters[1]
+                    for (var i = 0 ; i < stateClusterRes2.length ; i++) {
+                        stateData.push([ stateClusterRes2[i][0], null, stateClusterRes2[i][1], null, null]);
+                    }
+                    //console.log(stateData)
+                    ///push centroid of cluster 1
+                    stateData.push([response.state_cluster.means[0][0], null, null, response.state_cluster.means[0][1], null])
+                    ///push centroid of cluster 2
+                    stateData.push([response.state_cluster.means[1][0], null, null, null, response.state_cluster.means[1][1]])
+                    data.addRows(stateData);
+
+                    var options = {
+                      title: 'Hour vs. Minutes for ' + response.state +' events',
+                      hAxis: {title: 'Hour', minValue: 0, maxValue: 24},
+                      vAxis: {title: 'Minutes', minValue: 0, maxValue: 60},
+                      legend: 'right',
+                      colors: ['#3399ff', '#00ff00', '#000099', '#006600']
+                    };
+
+                    var chart = new google.visualization.ScatterChart(document.getElementById('chart_div_state'));
+
+                    chart.draw(data, options);
+                }
+           }).error(function myerror(err){
+               console.log(err);
+           })
+       }
+    });
+
+</script>
+
+
+
+</html>

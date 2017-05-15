@@ -7,36 +7,23 @@ var queryModel          =   require("./models/query");
 var analytics_4         =   require("./models/analytics_4");
 
 router.get("/",function(req,res){
-    res.json({"error" : false,"message" : "Hello World"});
-    //res.sendFile(path.join(__dirname + '/index.html'));
-});
-
-router.get("/index.html",function(req,res){
-    //res.json({"error" : false,"message" : "Hello World"});
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 
-router.get("/analytics_4.html",function(req,res){
-    //res.json({"error" : false,"message" : "Hello World"});
-    res.sendFile(path.join(__dirname + '/analytics_4.html'));
+router.get("/index.html",function(req,res){
+    res.sendFile(path.join(__dirname + '/index.html'));
 });
 
-router.get("/prediction.html",function(req,res){
-    //res.json({"error" : false,"message" : "Hello World"});
-    res.sendFile(path.join(__dirname + '/prediction.html'));
+router.get("/state-prediction.html",function(req,res){
+    res.sendFile(path.join(__dirname + '/state-prediction.html'));
 });
 
-router.get("/cluster.html",function(req,res){
+router.get("/analytics.html",function(req,res){
     //res.json({"error" : false,"message" : "Hello World"});
-    res.sendFile(path.join(__dirname + '/cluster.html'));
+    res.sendFile(path.join(__dirname + '/analytics.html'));
 });
 
-router.get("/cluster_testing.html",function(req,res){
-    //res.json({"error" : false,"message" : "Hello World"});
-    res.sendFile(path.join(__dirname + '/cluster_testing.html'));
-});
-
-router.get("/file4/state/:state/start_date/:start_date/end_date/:end_date/start_time/:start_time/end_time/:end_time",function(req,res){
+router.get("/file4/state/:state/start_date/:start_date/end_date/:end_date/start_time/:start_time/end_time/:end_time/dma/:dma",function(req,res){
     console.log("file4 request")
     queryModel.file_4(req, function(err, data){
         if(err){

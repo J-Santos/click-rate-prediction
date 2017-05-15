@@ -155,7 +155,8 @@ exports.file_4 = function (req, callback){
 	console.log(req.params)
    	var country="US";
    	var state=req.params.state
-   	var dma="807";
+   	var dma = req.params.dma
+   	//var dma="807";
    	var date1=req.params.start_date;
    	var date2=req.params.end_date;
    	var start_time=req.params.start_time
@@ -186,7 +187,7 @@ exports.file_4 = function (req, callback){
 	        console.log(err);
 	    }else{
 	        //console.log("result");
-	        console.log(result);
+	        //console.log(result);
 			/*
 			var query1="select events.count(uuid) as total_count,traffic_source as source, platform from events,page_views where events.country='"+country+"' and events.state='"+state+"' and events.dma='"+dma+"' and events.day between '"+date1+"' and '"+date2+"' and events.hour between + "+
 			  "'"+start_time+"' and '"+end_time+"' and events.document_id=page_views.document_id GROUP BY source";
@@ -199,12 +200,11 @@ exports.file_4 = function (req, callback){
 		        	console.log(err);
 		        }else{
 		            //console.log("result1");
-		            console.log(result1);
 					var final_result={
 		                result1:result,
 		                result2:result1
 		          	};
-		            console.log(final_result);
+		            //console.log(final_result);
 		            callback(err, final_result)
 		        }
 		     });
