@@ -219,8 +219,8 @@
                 //
                 ////////////////////
 
-                var us_count = response.usCluster.clusters[0].length + response.usCluster.clusters[1].length
-                var state_count = response.stCluster.clusters[0].length + response.stCluster.clusters[1].length
+                var us_count = response.us_cluster.clusters[0].length + response.us_cluster.clusters[1].length
+                var state_count = response.state_cluster.clusters[0].length + response.state_cluster.clusters[1].length
 
                 var P_state_given_ad_is_clicked = state_count / us_count
                 var P_clicked = response.ctr
@@ -273,23 +273,23 @@
                     // console.log(testData)
 
                     console.log("------US_Cluster--------------")
-                    console.log(response.usCluster)
+                    console.log(response.us_cluster)
                     console.log("------US_Cluster--------------")
-                    var usClusterRes1 = response.usCluster.clusters[0]
+                    var usClusterRes1 = response.us_cluster.clusters[0]
                     for (var i = 0 ; i < usClusterRes1.length ; i++) {
                         testData.push([ usClusterRes1[i][0], usClusterRes1[i][1] , null, null, null]);
                     }
                     console.log(testData)
 
                     var testData2 = [];
-                    var usClusterRes2 = response.usCluster.clusters[1]
+                    var usClusterRes2 = response.us_cluster.clusters[1]
                     for (var i = 0 ; i < usClusterRes2.length ; i++) {
                         testData.push([ usClusterRes2[i][0], null, usClusterRes2[i][1], null, null]);
                     }
                     console.log(testData)
                     ///push centroid of cluster 1
-                    testData.push([response.usCluster.means[0][0], null, null, response.usCluster.means[0][1], null])
-                    testData.push([response.usCluster.means[1][0], null, null, null, response.usCluster.means[1][1]])
+                    testData.push([response.us_cluster.means[0][0], null, null, response.us_cluster.means[0][1], null])
+                    testData.push([response.us_cluster.means[1][0], null, null, null, response.us_cluster.means[1][1]])
 
                     ///push centroid of cluster 2
 
@@ -352,23 +352,23 @@
                     // console.log(testData)
 
                     console.log("------State_Cluster--------------")
-                    console.log(response.stCluster)
+                    console.log(response.state_cluster)
                     console.log("------State_Cluster--------------")
-                    var stateClusterRes1 = response.stCluster.clusters[0]
+                    var stateClusterRes1 = response.state_cluster.clusters[0]
                     for (var i = 0 ; i < stateClusterRes1.length ; i++) {
                         stateData.push([ stateClusterRes1[i][0], stateClusterRes1[i][1] , null, null, null]);
                     }
                     console.log(stateData)
 
                     var testData2 = [];
-                    var stateClusterRes2 = response.stCluster.clusters[1]
+                    var stateClusterRes2 = response.state_cluster.clusters[1]
                     for (var i = 0 ; i < stateClusterRes2.length ; i++) {
                         stateData.push([ stateClusterRes2[i][0], null, stateClusterRes2[i][1], null, null]);
                     }
                     console.log(stateData)
                     ///push centroid of cluster 1
-                    stateData.push([response.stCluster.means[0][0], null, null, response.stCluster.means[0][1], null])
-                    stateData.push([response.stCluster.means[1][0], null, null, null, response.stCluster.means[1][1]])
+                    stateData.push([response.state_cluster.means[0][0], null, null, response.state_cluster.means[0][1], null])
+                    stateData.push([response.state_cluster.means[1][0], null, null, null, response.state_cluster.means[1][1]])
 
                     ///push centroid of cluster 2
 
@@ -393,7 +393,7 @@
                       hAxis: {title: 'hour', minValue: 0, maxValue: 24},
                       vAxis: {title: 'Weight', minValue: 0, maxValue: 60},
                       legend: 'none',
-                      colors: ['#3399ff', '#00ff00', '#cc0000', '#001a00']
+                      colors: ['#3399ff', '#00ff00', '#cc0000', '#006600']
                     };
 
                     //var options = {};

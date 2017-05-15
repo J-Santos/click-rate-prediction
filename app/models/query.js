@@ -55,48 +55,99 @@ function testing(){
 }
 
 exports.dbQuery = function (req, callback){
-	testing()
+	//testing()
  	var state = req.params.state
  	var adId = req.params.ad_id
 
  	///check if this was processed already, ad_id-state combination
- 	var queryCheck = 'select * from counts_per_ad_id_and_state where ad_id = '+adId +' and state = "' +state +'"'
+ 	var queryCheckState = 'select * from history where clicked_ad_id = '+adId +' and state_or_country = "' +state +'"'
 
- 	dbconnection.query(queryCheck, function(err, rows, fields) {
+ 	dbconnection.query(queryCheckState, function(err, rows, fields) {
  		if(rows.length == 0){
  			console.log("This entry doesn't exist. Processing all queries.")
- 			var insertTemp1 = 'create table temp1 as (select display_id from clicked_ads where clicked_ad_id = '+adId+')'
- 			dbconnection.query(insertTemp1, function(err1, rows1, fields1) {
- 				var insertTemp2 = 'create table temp2 as (select display_id, hour, minute from '+ state +'_events)'
- 				console.log("Finished creating temp1.")
- 				dbconnection.query(insertTemp2, function(err2, rows2, fields2) {
- 					//'(select * from temp2) as t2 ' +
- 					var createInnerJoinTemp3 = 'create table temp3 as (select t2.display_id, t2.hour, t2.minute from ' + 
-						'(select * from temp1) as t1 ' +
-						'inner join ' +
-						'(select display_id, hour, minute from '+ state +'_events) as t2 ' +
-						'on t1.display_id = t2.display_id)'
+
+ 			//var insertTemp2 = 'create table temp2 as (select display_id, hour, minute from '+ state +'_events)'
+			//console.log("Finished creating temp1.")
+			var createInnerJoinTemp1 = 'create table temp1 as (select t1.clicked_ad_id, t2.state, t2.display_id, t2.hour, t2.minute from ' + 
+				'(select display_id, clicked_ad_id from clicked_ads where clicked_ad_id = '+adId+') as t1 ' +
+				'inner join ' +
+				'(select state, display_id, hour, minute from '+ state +'_events) as t2 ' +
+				'on t1.display_id = t2.display_id)'
+			dbconnection.query(createInnerJoinTemp1, function(err1, rows1, fields1) {
+				var createTemp2 = 'create table temp2 as (select t3.clicked_ad_id, t4.state, t4.display_id, t4.hour, t4.minute from '+
+					'(select display_id, clicked_ad_id from clicked_ads where clicked_ad_id = '+adId+') as t3 '+
+					'inner join '+
+					'(select country as state, display_id, hour, minute from US_events) as t4 '+
+					'on t3.display_id = t4.display_id)'
+
+				console.log("Finished creating temp1.")
+				dbconnection.query(createTemp2, function(err2, rows2, fields2) {
 					console.log("Finished creating temp2.")
-					dbconnection.query(createInnerJoinTemp3, function(err3, rows3, fields3) {
-						var createTemp4 = 'create table temp4 as (select t4.display_id, t4.hour, t4.minute from '+
-							'(select * from temp1) as t1 '+
-							'inner join '+
-							'(select display_id, hour, minute from US_events) as t4 '+
-							'on t1.display_id = t4.display_id)'
-						console.log("Finished creating temp3.")
- 						dbconnection.query(createTemp4, function(err4, rows4, fields4) {
- 							console.log("Finished creating temp4.")
- 							processNewQueries(adId, state, callback)
- 						});
- 					});
- 				});
- 			});
+					processNewQueries(adId, state, callback)
+				});
+			});
  		}else{
  			console.log("This entry already exist. Returning results.")
- 			callback(err, rows[0])
+ 			var queryCheckUS = 'select * from history where clicked_ad_id = '+adId +' and state_or_country = "US"'
+ 			//console.log(rows)
+ 			//var clusters_state = processRowsForClusters(rows)
+ 			dbconnection.query(queryCheckUS, function(errUS, rowsUS, fieldsUS) {
+ 				//var clusters_us = processRowsForClusters(rowsUS)
+ 				//console.log("US")
+ 				//console.log(rowsUS)
+ 				var queryCTR = 'select ctr from click_rate where ad_id = '+ adId
+				dbconnection.query(queryCTR, function(errCTR, rowsCTR, fieldsCTR) {
+	 				//var clusters_us = processRowsForClusters(rowsUS)
+	 				//console.log("US")
+	 				//console.log(rowsUS)
+	 				var parser = JSON.parse(JSON.stringify(rowsCTR))
+	 				var clusters_us = createClusters(processRowsForClusters(rowsUS), 2)
+					var clusters_state = createClusters(processRowsForClusters(rows), 2)
+			 		var data_res = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':parser[0].ctr}
+					callback(err, data_res)
+ 				});
+
+ 			});
+ 			//callback(err, rows[0])
  		}
 
  	});
+
+ 	// dbconnection.query(queryCheck, function(err, rows, fields) {
+ 	// 	if(rows.length == 0){
+ 	// 		console.log("This entry doesn't exist. Processing all queries.")
+ 	// 		var insertTemp1 = 'create table temp1 as (select display_id from clicked_ads where clicked_ad_id = '+adId+')'
+ 	// 		dbconnection.query(insertTemp1, function(err1, rows1, fields1) {
+ 	// 			var insertTemp2 = 'create table temp2 as (select display_id, hour, minute from '+ state +'_events)'
+ 	// 			console.log("Finished creating temp1.")
+ 	// 			dbconnection.query(insertTemp2, function(err2, rows2, fields2) {
+ 	// 				//'(select * from temp2) as t2 ' +
+ 	// 				var createInnerJoinTemp3 = 'create table temp3 as (select t2.display_id, t2.hour, t2.minute from ' + 
+		// 				'(select * from temp1) as t1 ' +
+		// 				'inner join ' +
+		// 				'(select display_id, hour, minute from '+ state +'_events) as t2 ' +
+		// 				'on t1.display_id = t2.display_id)'
+		// 			console.log("Finished creating temp2.")
+		// 			dbconnection.query(createInnerJoinTemp3, function(err3, rows3, fields3) {
+		// 				var createTemp4 = 'create table temp4 as (select t4.display_id, t4.hour, t4.minute from '+
+		// 					'(select * from temp1) as t1 ' +
+		// 					'inner join '+
+		// 					'(select display_id, hour, minute from US_events) as t4 '+
+		// 					'on t1.display_id = t4.display_id)'
+		// 				console.log("Finished creating temp3.")
+ 	// 					dbconnection.query(createTemp4, function(err4, rows4, fields4) {
+ 	// 						console.log("Finished creating temp4.")
+ 	// 						processNewQueries(adId, state, callback)
+ 	// 					});
+ 	// 				});
+ 	// 			});
+ 	// 		});
+ 	// 	}else{
+ 	// 		console.log("This entry already exist. Returning results.")
+ 	// 		callback(err, rows[0])
+ 	// 	}
+
+ 	// });
 }
 
 function performQueryCount(query, name, callback){
@@ -126,27 +177,46 @@ function performQueryCount(query, name, callback){
 				var count = parser[0].count
 				data = {'ctr': count}
 			}else if(name == 'state_cluster'){
-				var array_2D = [];
-				for (var i in rows) {
-        			console.log('HOUR: ', rows[i].hour);
-        			console.log('MINUTE: ', rows[i].minute);
-        			array_2D.push([rows[i].hour, rows[i].minute])
-   	 			}
-   	 			data = {'state_cluster': array_2D}
+				arr = processRowsForClusters(rows)
+				data = {'state_cluster': arr}
+				// var array_2D = [];
+				// for (var i in rows) {
+    //     			console.log('HOUR: ', rows[i].hour);
+    //     			console.log('MINUTE: ', rows[i].minute);
+    //     			array_2D.push([rows[i].hour, rows[i].minute])
+   	//  			}
+   	//  			data = {'state_cluster': array_2D}
 			}else if(name == 'us_cluster'){
-				var array_2D = [];
-				for (var i in rows) {
-        			console.log('HOUR: ', rows[i].hour);
-        			console.log('MINUTE: ', rows[i].minute);
-        			array_2D.push([rows[i].hour, rows[i].minute])
-   	 			}
-   	 			data = {'us_cluster': array_2D}
+				arr = processRowsForClusters(rows)
+				data = {'us_cluster': arr}
+				// var array_2D = [];
+				// for (var i in rows) {
+    //     			console.log('HOUR: ', rows[i].hour);
+    //     			console.log('MINUTE: ', rows[i].minute);
+    //     			array_2D.push([rows[i].hour, rows[i].minute])
+   	//  			}
+   	//  			data = {'us_cluster': array_2D}
 			}
 			console.log("Finished performing query: " + query)
 	        callback(err, data)
 	    }
     });
 
+}
+
+function processRowsForClusters(rows){
+	var array_2D = [];
+	for (var i in rows) {
+		//console.log('HOUR: ', rows[i].hour);
+		//console.log('MINUTE: ', rows[i].minute);
+		array_2D.push([rows[i].hour, rows[i].minute])
+	}
+	return array_2D;
+}
+
+function createClusters(input, numOfClusters){
+	var km = kmean.create(input, numOfClusters);
+	return km.process();
 }
 
 function processNewQueries(adId, state, callback_res){
@@ -175,14 +245,18 @@ function processNewQueries(adId, state, callback_res){
 	// 	'(select * from temp2) as t2 ' +
 	// 	'on t1.display_id = t2.display_id'
 
-	var queryStateGivenClickedAd = 'select count(*) as count from temp3'
+	///////var queryStateGivenClickedAd = 'select count(*) as count from temp3'
 	//var queryState = 'select count(*) as count from '+ state +'_events'
-	var queryState = 'select count(*) as count from temp2'
+	////////var queryState = 'select count(*) as count from temp2'
 	//var queryClicks = 'select count(*) as count from clicked_ads where clicked_ad_id = '+ adId
-	var queryClicks = 'select count(*) as count from temp1'
+	/////////var queryClicks = 'select count(*) as count from temp1'
+
+
+
+
 	var queryCtr = 'select ctr as count from click_rate where ad_id = '+ adId
-	var queryStateCluster = 'select hour, minute from temp3'
-	var queryUSCluster = 'select hour, minute from temp4'
+	var queryStateCluster = 'select hour, minute from temp1'
+	var queryUSCluster = 'select hour, minute from temp2'
 
 	///////////////////////
 	/// Remove query since this number doesn't change and we get better performanace
@@ -192,17 +266,19 @@ function processNewQueries(adId, state, callback_res){
 	// }
 	////////////////////////
 
-	var functionGivenClicked = function(callback1){
-    	performQueryCount(queryStateGivenClickedAd, 'clicks_per_state', callback1)
-	}
+	// var functionGivenClicked = function(callback1){
+ //    	performQueryCount(queryStateGivenClickedAd, 'clicks_per_state', callback1)
+	// }
 
-	var functionState = function(callback2){
-    	performQueryCount(queryState, 'total_state', callback2)
-	}
+	// var functionState = function(callback2){
+ //    	performQueryCount(queryState, 'total_state', callback2)
+	// }
 
-	var functionClicks = function(callback4){
-    	performQueryCount(queryClicks, 'total_clicks', callback4)
-	}
+	// var functionClicks = function(callback4){
+ //    	performQueryCount(queryClicks, 'total_clicks', callback4)
+	// }
+
+
 
 	var functionCtr = function(callback5){
     	performQueryCount(queryCtr, 'ctr', callback5)
@@ -232,116 +308,74 @@ function processNewQueries(adId, state, callback_res){
  				temp[keys[key]] = result[i][keys[key]]
  			}
  		}
- 		// var data = {'ad_id': adId, 'state': state, 'total_clicks': temp.total_clicks, 'clicks_per_state':temp.clicks_per_state, 
- 		// 		   'total_us':18595452, 'total_state': temp.total_state, 'ctr':temp.ctr}
- 		// var data = {'ad_id': adId, 'state': state, 'total_clicks': "temp.total_clicks", 'clicks_per_state':"temp.clicks_per_state", 
- 		// 		   'total_us':18595452, 'total_state': "temp.total_state", 'ctr':temp.ctr}
- 		var clusterObject;
- 		var testCluster = kmeans.clusterize(temp.state_cluster, {k: 2}, (err,res) => {
-	  		if (err){
-	  			console.error(err);
-	  		}else{
-	  			console.log("----------------------------------------------------------------------------------")
-	  			console.log('%o',res);
-	  			clusterObject = res
-	  			console.log("----------------------------------------------------------------------------------")
-	  		}
-		});
-		console.log(testCluster)
  		var data = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
  				   'ctr':temp.ctr}
  		//callback(err,data)
- 	// 	kmeans.clusterize(temp.state_cluster, {k: 2}, (err,res) => {
-	 //  		if (err){
-	 //  			console.error(err);
-	 //  		}else{
-	 //  			console.log("----------------------------------------------------------------------------------")
-	 //  			console.log('%o',res);
-	 //  			console.log("----------------------------------------------------------------------------------")
-	 //  		}
-		// });
 
 		var queryInsert = 'INSERT into counts_per_ad_id_and_state '+
 			'(ad_id,state,state_cluster,us_cluster,ctr) ' +
 			'values '+
 			'(' + adId +',"'+state+'",'+temp.state_cluster+','+temp.us_cluster+','+temp.ctr+')'
-			
-		//,total_clicks,clicks_per_state,18595452,total_state,'+temp.ctr+')'
 
-		//'(' + adId +',"'+state+'",'+"temp.total_clicks"+','+"temp.clicks_per_state"+',18595452,'+"temp.total_state"+','+temp.ctr+')'
-		// console.log("INSERT: " + queryInsert)
+		var queryInsertTemp1 = 'insert into history select * from temp1'
+		var queryInsertTemp2 = 'insert into history select * from temp2'
 
-		// var deleteTables = 'drop table temp1, temp2, temp3, temp4'
- 	// 		console.log("Finished inserting data for future queries.")
- 	// 		console.log(data)
- 	// 		dbconnection.query(deleteTables, function(err1, rows1, fields1) {
- 	// 			console.log("Finished deleting temp tables.")
- 	// 			callback_res(err,data)
- 	// 		});
+ 		//console.log("Finished deleting temp tables.")
+		//callback_res(err,data)
+		//var clusterObject;
+		//var km_us = kmean.create(temp.us_cluster, 2);
 
- 		var deleteTables = 'drop table temp1, temp2, temp3, temp4'
-		console.log(data)
-		dbconnection.query(deleteTables, function(err1, rows1, fields1) {
-			console.log("Finished deleting temp tables.")
-			//callback_res(err,data)
-			//var clusterObject;
+		///Insert process data into history table for future requests
+		///Then, delete the temp tables
+		dbconnection.query(queryInsertTemp1, function(err1, rows1, fields1) {
+			dbconnection.query(queryInsertTemp2, function(err2, rows2, fields2) {
+				// var data1 = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
+				//   			'ctr':temp.ctr, 'stCluster': clusters_state, 'usCluster': clusters_us}
+				console.log("Finished inserting data in history table.")
+				var deleteTables = 'drop table temp1, temp2'
+				dbconnection.query(deleteTables, function(err1, rows1, fields1) {
+					console.log("Finished deleting temp tables.")
 
+					var clusters_us = createClusters(temp.us_cluster, 2)
+					var clusters_state = createClusters(temp.state_cluster, 2)
+			 		var data_res = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':temp.ctr}
+					callback_res(err, data_res)
+				});
+			});
 
-			var km_us = kmean.create(temp.us_cluster, 2);
-
-			var clusters_us = km_us.process();
-			//console.log(result);
-
-			var km_state = kmean.create(temp.state_cluster, 2);
-			var clusters_state = km_state.process();
-
-			var data1 = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
-			  			'ctr':temp.ctr, 'cluster': clusterObject, 'stCluster': clusters_state, 'usCluster': clusters_us}
-
-			callback_res(err, data1)
-
-
-	 	// 	kmeans.clusterize(temp.state_cluster, {k: 2}, (errkmeans,reskmeans) => {
-		 //  		if (err){
-		 //  			console.error(errkmeans);
-		 //  		}else{
-		 //  			console.log("----------------------------------------------------------------------------------")
-		 //  			console.log('%o',reskmeans);
-		 //  			clusterObject = reskmeans
-		 //  			console.log("----------------------------------------------------------------------------------")
-		 //  		}
-		 //  		stCluster = reskmeans
-			// 	//callback_res(err,data)
-			// 	kmeans.clusterize(temp.us_cluster, {k: 2}, (errkmeans,reskmean) => {
-			//   		if (err){
-			//   			console.error(errkmean);
-			//   		}else{
-			//   			console.log("----------------------------------------------------------------------------------")
-			//   			console.log('%o',reskmean);
-			//   			clusterObject = reskmean
-			//   			console.log("----------------------------------------------------------------------------------")
-			//   		}
-			//   		usCluster = reskmean
-			// 		//callback_res(err,data)
-			// 		//console.log(stateCluster)
-			//  		var data1 = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
-			//  			'ctr':temp.ctr, 'cluster': clusterObject, 'stCluster': stCluster, 'usCluster': usCluster}
-			//  		callback_res(err, data1);
-			// 	});
-			// });
-	 		
 		});
 
- 		// dbconnection.query(queryInsert, function(err, rows, fields) {
- 		// 	var deleteTables = 'drop table temp1, temp2, temp3, temp4'
- 		// 	console.log("Finished inserting data for future queries.")
- 		// 	console.log(err)
- 		// 	console.log(data)
- 		// 	dbconnection.query(deleteTables, function(err1, rows1, fields1) {
- 		// 		console.log("Finished deleting temp tables.")
- 		// 		callback_res(err,data)
- 		// 	});
- 		// });
+// var clusters_us = createClusters(temp.us_cluster, 2)
+
+// var clusters_state = createClusters(temp.state_cluster, 2)
+
+// // var data1 = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
+// //   			'ctr':temp.ctr, 'stCluster': clusters_state, 'usCluster': clusters_us}
+
+//  var data1 = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':temp.ctr}
+
+// callback_res(err, data1)
+
+ 		// 	var deleteTables = 'drop table temp1, temp2'
+		// console.log(data)
+		// dbconnection.query(deleteTables, function(err1, rows1, fields1) {
+		// 	console.log("Finished deleting temp tables.")
+		// 	//callback_res(err,data)
+		// 	//var clusterObject;
+		// 	var km_us = kmean.create(temp.us_cluster, 2);
+
+		// 	var clusters_us = km_us.process();
+		// 	//console.log(result);
+
+		// 	var km_state = kmean.create(temp.state_cluster, 2);
+		// 	var clusters_state = km_state.process();
+
+		// 	var data1 = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
+		// 	  			'ctr':temp.ctr, 'cluster': clusterObject, 'stCluster': clusters_state, 'usCluster': clusters_us}
+
+		// 	callback_res(err, data1)
+	 		
+		// });
  	});
 
 }
@@ -350,27 +384,13 @@ function processNewQueries(adId, state, callback_res){
 
 exports.file_4 = function (req, callback){
 	console.log(req.params)
-	// var temp=req.params.start_date
- //   var date1=temp.split("-");
- //  // console.log(date1[2]);
- //   var date2=date1[2].split("T");
- //   date1=date2[0];
- //  //  console.log(date1);
-
- //    var temp=req.params.end_date
- //    var date2=temp.split("-");
- //  //  console.log(date2[2]);
- //    var temp=date2[2].split("T");
- //    date2=temp[0];
- // //   console.log(date2);
-
-   var country="US";
-   var state=req.params.state
-   var dma="807";
-   var date1=req.params.start_date;
-   var date2=req.params.end_date;
-   var start_time=req.params.start_time
-   var end_time=req.params.end_time
+   	var country="US";
+   	var state=req.params.state
+   	var dma="807";
+   	var date1=req.params.start_date;
+   	var date2=req.params.end_date;
+   	var start_time=req.params.start_time
+   	var end_time=req.params.end_time
 
 
    /*query1--- to list total number of users in the given range in each platform*/
