@@ -148,8 +148,8 @@ function processNewQueries(adId, state, callback_res, us_exist){
  				temp[keys[key]] = result[i][keys[key]]
  			}
  		}
- 		var data = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
- 				   'ctr':temp.ctr}
+ 		// var data = {'ad_id': adId, 'state': state, 'state_cluster': temp.state_cluster, 'us_cluster':temp.us_cluster, 
+ 		// 		   'ctr':temp.ctr}
 
 		var queryInsertTemp1 = 'insert into history select * from temp1'
 		var queryInsertTemp2 = 'insert into history select * from temp2'
@@ -163,11 +163,6 @@ function processNewQueries(adId, state, callback_res, us_exist){
 					console.log("US CLUSTER LENGTH: "+temp.us_cluster.length)
 					console.log("STATE CLUSTER LENGTH: "+temp.state_cluster.length)
 					var clusters_us = createClusters(temp.us_cluster, 2)
-
-					// if(temp.state_cluster.length < 2){
-
-					// }
-
 					var clusters_state = createClusters(temp.state_cluster, 2)
 			 		var data_res = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':temp.ctr}
 					callback_res(err, data_res)
@@ -183,8 +178,17 @@ function processNewQueries(adId, state, callback_res, us_exist){
 						console.log("Finished deleting temp tables.")
 						console.log("US CLUSTER LENGTH: "+temp.us_cluster.length)
 						console.log("STATE CLUSTER LENGTH: "+temp.state_cluster.length)
+						var clusters_state;
+						if(temp.state_cluster.length < 2){
+							clusters_state = {
+								'clusters': [[0,0], [0,0]],
+								'means': [[0,0], [0,0]],
+
+							}
+						}else{
+							clusters_state = createClusters(temp.state_cluster, 2)
+						}
 						var clusters_us = createClusters(temp.us_cluster, 2)
-						var clusters_state = createClusters(temp.state_cluster, 2)
 				 		var data_res = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':temp.ctr}
 						callback_res(err, data_res)
 					});
