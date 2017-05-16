@@ -18,6 +18,29 @@ router.get("/state-prediction.html",function(req,res){
     res.sendFile(path.join(__dirname + '/state-prediction.html'));
 });
 
+router.get("/exploration.html",function(req,res){
+    res.sendFile(path.join(__dirname + '/exploration.html'));
+});
+
+router.get("/exploration1.html",function(req,res){
+    res.sendFile(path.join(__dirname + '/exploration1.html'));
+});
+
+router.get("/images/uuid.png",function(req,res){
+    res.sendFile(path.join(__dirname + '/images/uuid.png'));
+});
+
+router.get("/images/days_timestamp.png",function(req,res){
+    res.sendFile(path.join(__dirname + '/images/days_timestamp.png'));
+});
+
+router.get("/images/hour_timestamp.png",function(req,res){
+    res.sendFile(path.join(__dirname + '/images/hour_timestamp.png'));
+});
+
+router.get("/images/train_heatmap.png",function(req,res){
+    res.sendFile(path.join(__dirname + '/images/train_heatmap.png'));
+});
 router.get("/analytics.html",function(req,res){
     //res.json({"error" : false,"message" : "Hello World"});
     res.sendFile(path.join(__dirname + '/analytics.html'));
@@ -63,5 +86,5 @@ console.log("Listening to PORT "+ port);
 
 var http = require ('http');
 
-server.timeout = 500000;  
+server.timeout = 1000000;  
 

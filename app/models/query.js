@@ -30,17 +30,27 @@ exports.dbQuery = function (req, callback){
 				'inner join ' +
 				'(select state, display_id, hour, minute from '+ state +'_events) as t2 ' +
 				'on t1.display_id = t2.display_id)'
+			console.log("Temp1 Query: "+ createInnerJoinTemp1);
 			dbconnection.query(createInnerJoinTemp1, function(err1, rows1, fields1) {
 				var createTemp2 = 'create table temp2 as (select t3.clicked_ad_id, t4.state, t4.display_id, t4.hour, t4.minute from '+
 					'(select display_id, clicked_ad_id from clicked_ads where clicked_ad_id = '+adId+') as t3 '+
 					'inner join '+
 					'(select country as state, display_id, hour, minute from US_events) as t4 '+
 					'on t3.display_id = t4.display_id)'
-
 				console.log("Finished creating temp1.")
-				dbconnection.query(createTemp2, function(err2, rows2, fields2) {
-					console.log("Finished creating temp2.")
-					processNewQueries(adId, state, callback)
+
+				var queryCheckUS = 'select * from history where clicked_ad_id = '+adId +' and state_or_country = "US" limit 5'
+				dbconnection.query(queryCheckUS, function(errUSCheck, rowsUSCheck, fieldsUSCheck) {
+					console.log("Finished querying history.")
+					if(rows.length == 0){
+						console.log("Temp2 Query: "+ createTemp2);
+						dbconnection.query(createTemp2, function(err2, rows2, fields2) {
+							console.log("Finished creating temp2.")
+							processNewQueries(adId, state, callback, false)
+						});
+					}else{
+						processNewQueries(adId, state, callback, true)
+					}
 				});
 			});
  		}else{
@@ -99,10 +109,20 @@ function createClusters(input, numOfClusters){
 	return km.process();
 }
 
-function processNewQueries(adId, state, callback_res){
+function processNewQueries(adId, state, callback_res, us_exist){
 	var queryCtr = 'select ctr as count from click_rate where ad_id = '+ adId
 	var queryStateCluster = 'select hour, minute from temp1'
-	var queryUSCluster = 'select hour, minute from temp2'
+
+
+	var queryUSCluster;
+	var queryUSNew = 'select hour, minute from temp2'
+	var queryUSExist = 'select * from history where clicked_ad_id = '+adId +' and state_or_country = "US"'
+
+	if(us_exist){
+		queryUSCluster = queryUSExist;
+	}else{
+		queryUSCluster = queryUSNew
+	}
 
 	////Define function to run async
 	var functionCtr = function(callback5){
@@ -134,20 +154,44 @@ function processNewQueries(adId, state, callback_res){
 		var queryInsertTemp1 = 'insert into history select * from temp1'
 		var queryInsertTemp2 = 'insert into history select * from temp2'
 
-		dbconnection.query(queryInsertTemp1, function(err1, rows1, fields1) {
-			dbconnection.query(queryInsertTemp2, function(err2, rows2, fields2) {
+		if(us_exist){
+			dbconnection.query(queryInsertTemp1, function(err1, rows1, fields1) {
 				console.log("Finished inserting data in history table.")
-				var deleteTables = 'drop table temp1, temp2'
+				var deleteTables = 'drop table temp1'
 				dbconnection.query(deleteTables, function(err1, rows1, fields1) {
 					console.log("Finished deleting temp tables.")
+					console.log("US CLUSTER LENGTH: "+temp.us_cluster.length)
+					console.log("STATE CLUSTER LENGTH: "+temp.state_cluster.length)
 					var clusters_us = createClusters(temp.us_cluster, 2)
+
+					// if(temp.state_cluster.length < 2){
+
+					// }
+
 					var clusters_state = createClusters(temp.state_cluster, 2)
 			 		var data_res = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':temp.ctr}
 					callback_res(err, data_res)
 				});
 			});
+		}else{
 
-		});
+			dbconnection.query(queryInsertTemp1, function(err1, rows1, fields1) {
+				dbconnection.query(queryInsertTemp2, function(err2, rows2, fields2) {
+					console.log("Finished inserting data in history table.")
+					var deleteTables = 'drop table temp1, temp2'
+					dbconnection.query(deleteTables, function(err1, rows1, fields1) {
+						console.log("Finished deleting temp tables.")
+						console.log("US CLUSTER LENGTH: "+temp.us_cluster.length)
+						console.log("STATE CLUSTER LENGTH: "+temp.state_cluster.length)
+						var clusters_us = createClusters(temp.us_cluster, 2)
+						var clusters_state = createClusters(temp.state_cluster, 2)
+				 		var data_res = {'ad_id': adId, 'state': state, 'state_cluster': clusters_state, 'us_cluster':clusters_us, 'ctr':temp.ctr}
+						callback_res(err, data_res)
+					});
+				});
+
+			});
+		}
  	});
 }
 

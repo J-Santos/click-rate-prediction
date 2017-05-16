@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Exploration</title>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+      google.charts.setOnLoadCallback(drawRegionsMap);
+google.charts.load('visualization', '1', {
+  packages: ['map']
+});
+
+function drawRegionsMap() {
+
+  var data = google.visualization.arrayToDataTable([
+    ['State', 'User Count'],
+    ['California', 2025579],
+    ['Texas',1381308],				                              
+	['New York',942910],
+	['Florida',915371],
+	['North Carolina',641245],
+    ['Illinois',638867],
+	['Pennsylvania', 544690],
+	['Ohio',535164],
+	['Michigan', 492293],
+	['Georgia',446792],
+	['Virginia', 443360],
+	['New Jersey',442660],
+	['Massachusetts',368800],
+	['Washington',357632],
+	['Minnesota',315023],
+	['Maryland',303446],
+	['Colorado',289375],
+	['Arizona',267663],
+	['Missouri',261507],
+	['Wisconsin',250648],
+	['Tennessee',249462],
+	['Indiana',229984],
+	['Connecticut',224597],
+	['Oregon',182971],
+	['South Carolina',181341],
+	['Kentucky',173876],
+	['Alabama',156211],
+	['Louisiana',156173],
+	['Iowa',128691],
+	['Oklahoma',123243],
+	['District of Columbia',122627],
+	['Kansas',119681],
+	['Utah',117267],
+	['Nevada',92304],
+	['Nebraska',91952],
+	['Arkansas',90645],
+	['Mississippi',87109],
+	['West Virginia',77608],
+	['New Mexico',69243],
+	['Delaware',60118],
+	['New Hampshire',58986],
+	['Idaho',58952],
+	['Hawaii',57872],
+	['Maine',52837],
+	['Rhode Island',41615],
+	['Montana',36033],
+	['North Dakota',32179],
+	['South Dakota',31314],
+	['Alaska',29779],
+	['Vermont', 24037],
+	  ['Wyoming',23650]
+	
+  ]);
+
+  var options = {
+    region: 'US',
+    resolution: 'provinces',
+	 
+	  backgroundColor:'#ecede8',
+	  colorAxis: {colors: ['#b3e002', '#fc7107', '#c40101']},
+	  
+	  
+	 
+  };
+
+  var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+  chart.draw(data, options);
+}
+    </script>
+   
+	
+	
+
+
+</head>
+
+<body>
+  
+  <center>
+  
+   <div id="regions_div" >
+   	
+   </div>
+  
+   
+  
+  
+	</center>
+  
+</body>
+</html>
